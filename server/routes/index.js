@@ -124,7 +124,7 @@ router.get('/api/tabList/1/data/1', function (req, res) {
         }
     })
 })
-//搜索页
+//Page de recherche
 router.get('/api/search/index', function (req, res) {
     res.send({
         code: 0,
@@ -142,7 +142,7 @@ router.get('/api/search/index', function (req, res) {
     })
 })
 
-//搜索结果页
+//Page des resultats de recherche
 router.get('/api/search/results', function (req, res) {
     let keys = Object.keys(req.query);
     let vals = Object.values(req.query)
@@ -163,7 +163,7 @@ router.get('/api/search/results', function (req, res) {
     })
 })
 
-//分类页
+//Menu
 router.get('/api/list/teaList', function (req, res) {
     res.send({
         code: 0,
@@ -251,7 +251,7 @@ router.get('/api/list/teaList', function (req, res) {
     })
 })
 
-//商品详情页
+//La page de produit
 router.get('/api/detail/productDetail', function (req, res) {
     let product = req.query.product;
     let sql = "select * from product where title='" + product + "'";
@@ -263,7 +263,7 @@ router.get('/api/detail/productDetail', function (req, res) {
     })
 })
 
-//登录
+//Login
 router.post('/api/login', function (req, res) {
     let userTel = req.body.data.userTel; //post从body中取值
     let pwd = req.body.data.userPwd;
@@ -302,7 +302,7 @@ router.post('/api/login', function (req, res) {
     })
 })
 
-//发送短信验证码
+//Envoyer le SMS avec un code de vérification
 router.post('/api/smscode', function (req, res) {
 
     let tel = req.body.phone;
@@ -348,7 +348,7 @@ router.post('/api/smscode', function (req, res) {
 
 })
 
-//短信登录
+//Login avec SMS
 router.post('/api/addUser', function (req, res) {
     let userTel = req.body.data.phone;
     //生成token
@@ -390,7 +390,7 @@ router.post('/api/addUser', function (req, res) {
     })
 })
 
-//注册
+//Inscription
 router.post('/api/register', function (req, res) {
     let tel = req.body.data.phone;
     let pwd = req.body.data.pwd;
@@ -403,7 +403,7 @@ router.post('/api/register', function (req, res) {
 
     let sql1 = "select * from user where tel='" + tel + "'";
     let sql2 = "insert into user(tel,pwd,imgURL,nickname,token) values(" + tel + ",'" + pwd + "','/touxiang.jpeg','" + tel + "','" + token + "')";
-    //用户是否存在
+    //Vérifier s'il existe l'utilisateur
     connection.query(sql1, function (error, result) {
         if (result.length > 0) {
             res.send({
@@ -430,7 +430,7 @@ router.post('/api/register', function (req, res) {
     })
 })
 
-//找回密码
+//Mot de passe oublié
 router.post('/api/recovery', function (req, res) {
     let tel = req.body.data.phone;
     let sql1 = "select * from user where tel='" + tel + "'";
@@ -460,11 +460,11 @@ router.post('/api/recovery', function (req, res) {
     })
 })
 
-//添加购物车
+//Ajouter au panier
 router.post('/api/addCart', function (req, response) {
     let token = req.body.headers.token
     let tokenObjet = jwt.decode(token);
-    //如果执行，就证明token过期了
+    //Vérifier le token est expiré ou non
     if(  getTokenLife(tokenObjet.exp) ){
         response.send({
             data:{
@@ -479,14 +479,14 @@ router.post('/api/addCart', function (req, response) {
 
     connection.query(sql, function (error, results) {
         let uid = results[0].id || 1;
-        //查询商品信息
+        //Demander des informations sur le produit
         sql = `select * from product where id=${productId}`
         connection.query(sql, function (err, res) {
-            //查询该用户之前是否添加过该商品
+            //Demander si l'utilisateur a déjà ajouté le produit
             sql = `select * from cart where uid=${uid} and product_id=${productId}`
             connection.query(sql, function (e, r) {
                 if (r.length) {
-                    //添加过
+                    //Si oui
                     sql = `update cart set product_num=${r[0].product_num+1} where id=${r[0].id}`
                     connection.query(sql, function () {
                         response.send({
@@ -498,7 +498,7 @@ router.post('/api/addCart', function (req, response) {
                         })
                     })
                 } else {
-                    //未添加过
+                    //Sinon
                     let product_name = res[0].title;
                     let product_price = res[0].price;
                     let product_imgURL = res[0].imgURL;
@@ -520,7 +520,7 @@ router.post('/api/addCart', function (req, response) {
     })
 })
 
-//购物车数据渲染
+//Rendu des données du panier
 router.post('/api/getCart', function (req, res) {
     let token = req.body.headers.token;
     let tokenObjet = jwt.decode(token);
@@ -552,7 +552,7 @@ router.post('/api/getCart', function (req, res) {
 
 })
 
-//删除购物车商品
+//Supprimer l'article du panier
 router.post('/api/deleteCart', function (req, res) {
     let idArr = req.body.data.idArr;
     idArr.forEach(v => {
@@ -568,7 +568,7 @@ router.post('/api/deleteCart', function (req, res) {
     })
 })
 
-//更新购物车商品数量
+//Mettre à jour le nombre d'articles dans le panier
 router.post('/api/updateCartNum', function (req, res) {
     let num = req.body.data.num;
     let id = req.body.data.id;
@@ -582,7 +582,7 @@ router.post('/api/updateCartNum', function (req, res) {
     })
 })
 
-//添加地址
+//Ajouter ou modifier une adresse
 router.post('/api/addOrEditAddress', function (req, res) {
     let [action, name, tel, province, city, county, areaCode, addressDetail, isDefault] = [
         req.body.data.action,
@@ -614,8 +614,8 @@ router.post('/api/addOrEditAddress', function (req, res) {
 
             console.log(uid);
 
-            if (!action) { //action为0说明为添加
-                if (isDefault) { //添加的是否是默认地址，默认地址只能有一个
+            if (!action) { //action=0 est ajout
+                if (isDefault) { //Si l'adresse ajouté est l'adresse par défaut
                     sql = `update address set isDefault=0`
                     connection.query(sql, function () {
                         sql = `insert into address(uid,name,tel,province,city,county,areaCode,addressDetail,isDefault) values(${uid},'${name}','${tel}','${province}','${city}','${county}','${areaCode}','${addressDetail}',${isDefault})`
@@ -677,7 +677,7 @@ router.post('/api/addOrEditAddress', function (req, res) {
     }
 })
 
-//获取用户地址
+//Obtenir l'adresse de l'utilisateur
 router.post('/api/getAddress', function (req, res) {
     let token = req.body.headers.token
     let tokenObjet = jwt.decode(token);
@@ -708,7 +708,7 @@ router.post('/api/getAddress', function (req, res) {
     }
 })
 
-//删除地址
+//Supprimer une adresse
 router.post('/api/deleteAddress', function (req, res) {
     let id = req.body.data.id
     let sql = `delete from address where id=${id}`
@@ -723,7 +723,7 @@ router.post('/api/deleteAddress', function (req, res) {
     })
 })
 
-//创建订单
+//Créer une commande
 router.post('/api/createOrder', function (req, res) {
     let products = req.body.data.products
     let price = req.body.data.orderPrice;
@@ -770,7 +770,7 @@ router.post('/api/createOrder', function (req, res) {
     })
 })
 
-//获取订单信息
+//Obtenir des informations sur la commande
 router.post('/api/getOrder', function (req, res) {
     let orderID = req.body.data.orderID;
     let sql = `select * from store_order where order_id=${orderID}`
@@ -785,7 +785,7 @@ router.post('/api/getOrder', function (req, res) {
     })
 })
 
-//更新订单状态
+//Mettre à jour le statut de la commande
 router.post('/api/updateOrder', function (req, res) {
     let orderID = req.body.data.orderID;
     let productList = req.body.data.productList;
@@ -805,7 +805,7 @@ router.post('/api/updateOrder', function (req, res) {
     })
 })
 
-//发起支付宝支付
+//Alipay
 router.post('/api/alipay',function (req, res) {
     let order=req.body.data;
     let price=order.order_price+'';
@@ -815,7 +815,7 @@ router.post('/api/alipay',function (req, res) {
     const formData=new AlipayFormData();
     //返回支付页面的url
     formData.setMethod('get');
-    //支付信息
+    //Infos du paiement
     formData.addField('bizContent', {
         outTradeNo: orderID,//订单号
         productCode: 'FAST_INSTANT_TRADE_PAY',//写死的
@@ -844,15 +844,15 @@ router.post('/api/alipay',function (req, res) {
         })
     })
 })
-//获取支付结果
+//Obtenir le résultat du paiement
 router.post('/api/payResult',function (req, res) {
     //token
     let token = req.headers.token;
     let tokenObj = jwt.decode(token);
-    //订单号
+    //numéro de commande
     let out_trade_no = req.body.out_trade_no;
     let trade_no = req.body.trade_no;
-    //支付宝配置
+    //Configurations de Alipay
     const formData = new AlipayFormData();
     // 调用 setMethod 并传入 get，会返回可以跳转到支付页面的 url
     formData.setMethod('get');
